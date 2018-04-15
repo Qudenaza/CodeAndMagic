@@ -1,12 +1,8 @@
 'use strict';
 
-var userDialog = document.querySelector('.setup'),
-    popupOpen = document.querySelector('.setup-open'),
-    popupOpenIcon = popupOpen.querySelector('.setup-open-icon'),
-    popupClose = document.querySelector('.setup-close'),
-    userNameInput = userDialog.querySelector('.setup-user-name'),
-    KEY_ESC = 27,
-    KEY_ENTER = 13,
+(function() {
+// Переменные и константы
+var userNameInput = document.querySelector('.setup-user-name'),
     wizardCoat = document.querySelector('.wizard-coat'),
     wizardEyes = document.querySelector('.wizard-eyes'),
     wizardFireball = document.querySelector('.setup-fireball-wrap'),
@@ -19,24 +15,24 @@ var userDialog = document.querySelector('.setup'),
     FIREBALL_COLOR = ['#ee4830', '#30a8ee', '#5ce6c0', '#e848d5', '#e6e848'],
     wizards = [
       {         
-        name: randomProperty(WIZARD_NAMES) + ' ' + randomProperty(WIZARD_SURNAMES),
-        coatColor: randomProperty(COAT_COLOR),
-        eyesColor: randomProperty(EYES_COLOR)
+        name: window.util.randomProperty(WIZARD_NAMES) + ' ' + window.util.randomProperty(WIZARD_SURNAMES),
+        coatColor: window.util.randomProperty(COAT_COLOR),
+        eyesColor: window.util.randomProperty(EYES_COLOR)
       },
       {
-        name: randomProperty(WIZARD_NAMES) + ' ' + randomProperty(WIZARD_SURNAMES),
-        coatColor: randomProperty(COAT_COLOR),
-        eyesColor: randomProperty(EYES_COLOR)
+        name: window.util.randomProperty(WIZARD_NAMES) + ' ' + window.util.randomProperty(WIZARD_SURNAMES),
+        coatColor: window.util.randomProperty(COAT_COLOR),
+        eyesColor: window.util.randomProperty(EYES_COLOR)
       },
       {
-        name: randomProperty(WIZARD_NAMES) + ' ' + randomProperty(WIZARD_SURNAMES),
-        coatColor: randomProperty(COAT_COLOR),
-        eyesColor: randomProperty(EYES_COLOR)
+        name: window.util.randomProperty(WIZARD_NAMES) + ' ' + window.util.randomProperty(WIZARD_SURNAMES),
+        coatColor: window.util.randomProperty(COAT_COLOR),
+        eyesColor: window.util.randomProperty(EYES_COLOR)
       },
       {
-        name: randomProperty(WIZARD_NAMES) + ' ' + randomProperty(WIZARD_SURNAMES),
-        coatColor: randomProperty(COAT_COLOR),
-        eyesColor: randomProperty(EYES_COLOR)
+        name: window.util.randomProperty(WIZARD_NAMES) + ' ' + window.util.randomProperty(WIZARD_SURNAMES),
+        coatColor: window.util.randomProperty(COAT_COLOR),
+        eyesColor: window.util.randomProperty(EYES_COLOR)
       }
 ];
 
@@ -44,54 +40,19 @@ document.querySelector('.setup-similar').classList.remove('hidden');
 
 // Функции
 
-function onPopupEscPress(e) {
-  if(e.keyCode === KEY_ESC) {
-    closePopup();
-  };
-};
-
-function openPopup() {
-  userDialog.classList.remove('hidden');
-  document.addEventListener('keydown', onPopupEscPress);
-};
-
-function closePopup() {
-  userDialog.classList.add('hidden');
-  document.removeEventListener('keydown', onPopupEscPress);
-};
-
-popupOpen.addEventListener('click', function() {
-  openPopup();
-});
-
-
-popupOpenIcon.addEventListener('keydown', function(e) {
-  if(e.keyCode === KEY_ENTER) {
-    openPopup();
-  }
-});
-
-popupClose.addEventListener('click', function() {
-  userDialog.classList.add('hidden');
-});
-
-popupClose.addEventListener('keydown', function(e) {
-  if(e.keyCode === KEY_ENTER) {
-    closePopup();
-  };
-});
-
 wizardCoat.addEventListener('click', function() {
-  wizardCoat.style.fill = randomProperty(COAT_COLOR);
+  wizardCoat.style.fill = window.util.randomProperty(COAT_COLOR);
 });
 
 wizardEyes.addEventListener('click', function() {
-  wizardEyes.style.fill = randomProperty(EYES_COLOR);
+  wizardEyes.style.fill = window.util.randomProperty(EYES_COLOR);
 });
 
 wizardFireball.addEventListener('click', function() {
-  wizardFireball.style.backgroundColor = randomProperty(FIREBALL_COLOR);
+  wizardFireball.style.backgroundColor = window.util.randomProperty(FIREBALL_COLOR);
 });
+
+
 // Обработчик события проверки валидности поля ввода имени 
 userNameInput.addEventListener('invalid', function(e) {
   e.preventDefault();
@@ -104,17 +65,6 @@ userNameInput.addEventListener('invalid', function(e) {
   };
 });
 
-// Функция возвращает случайный элемент массива arr
-function randomProperty(arr) {
-   return arr[randomInteger(arr.length - 1)];
-}
-
-// Функция поиска случайного значения от нуля до max
-function randomInteger(max) {
-    var rand = Math.floor(0 + Math.random() * (max + 1 - 0));
-
-    return rand;
-};
 
 // Функция отрисовки мага
 function renderWizard(wizard) {
@@ -140,3 +90,42 @@ for(var i = 0; i < wizards.length; i++) {
 // Помещаем магов на страницу
 similarListElement.appendChild(fragment);
 
+var shopElement = document.querySelector('.setup-artifacts-shop'),
+    draggedItem = null,
+    artifactsElement = document.querySelector('.setup-artifacts');
+
+shopElement.addEventListener('dragstart', function(e) {
+  if(e.target.localName === 'img') {
+    draggedItem = e.target.cloneNode();
+    e.dataTransfer.setData('text/plain', e.target.alt);
+  };
+});
+
+artifactsElement.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+artifactsElement.addEventListener('drop', function(e) {
+  e.target.style.backgroundColor = '';
+  e.target.style.border = '';
+  e.preventDefault();
+  if(!e.srcElement.firstChild && e.srcElement.localName !== 'img') {
+    e.target.appendChild(draggedItem);
+  } else {
+    throw new Error('Ячейка занята!')
+  }
+});
+
+artifactsElement.addEventListener('dragenter', function(e) {
+    e.target.style.backgroundColor = 'yellow';
+    e.target.style.border = '2px solid red';
+    e.preventDefault();
+});
+
+artifactsElement.addEventListener('dragleave', function(e) {
+  e.target.style.backgroundColor = '';
+  e.target.style.border = '';
+  e.preventDefault();
+});
+})();
